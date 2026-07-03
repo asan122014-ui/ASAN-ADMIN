@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { RefreshCw } from "lucide-react";
 
 import Topbar from "../components/Topbar";
 import StatsPanel from "../components/StatsPanel";
@@ -273,7 +274,16 @@ const handleAssignDriver = async () => {
     });
   }, [logList, search, dateFilter]);
 
-  
+
+const refreshDashboard = async () => {
+  await Promise.all([
+    fetchDrivers(),
+    fetchParents(),
+    loadRequests(),
+    fetchAnalytics(),
+    fetchLogs(),
+  ]);
+};  
 
   /* ==============================
         EFFECTS
@@ -333,6 +343,7 @@ socket.on("driver_approved", () => {
   }));
 });
 
+
     return () => socket.disconnect();
   }, []);
   return (
@@ -353,12 +364,24 @@ socket.on("driver_approved", () => {
           </p>
         </div>
 
-        <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl px-6 py-4 text-white shadow-lg">
-          <p className="text-sm opacity-80">Total Drivers</p>
-          <h2 className="text-3xl font-bold">
-            {stats.totalDrivers}
-          </h2>
-        </div>
+        <div className="flex items-center gap-4">
+
+  <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl px-6 py-4 text-white shadow-lg">
+    <p className="text-sm opacity-80">Total Drivers</p>
+    <h2 className="text-3xl font-bold">
+      {stats.totalDrivers}
+    </h2>
+  </div>
+
+  <button
+  onClick={refreshDashboard}
+  className="flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-100 rounded-2xl px-5 py-4 shadow-md transition"
+>
+  <RefreshCw size={18} />
+  Refresh
+</button>
+
+</div>
 
       </div>
 
