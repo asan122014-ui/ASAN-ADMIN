@@ -20,6 +20,7 @@ import AnalyticsModal from "../components/AnalyticsModal";
 import LogsModal from "../components/LogsModal";
 import ParentTable from "../components/ParentTable";
 import PendingAlert from "../components/PendingAlert";
+import LocationChangeRequests from "../components/LocationChangeRequests";
 
 import BillingSettings from "./BillingSettings";
 
@@ -1662,6 +1663,8 @@ function Dashboard() {
                   : view ===
                     "parents"
                   ? "Registered Parents"
+                  : view === "locationChanges"
+                  ? "Location Change Requests"
                   : "Billing Settings"}
 
               </h2>
@@ -1677,7 +1680,7 @@ function Dashboard() {
                   : ""}
 
                 {view !==
-                  "billing" &&
+                  "billing" && view !== "locationChanges" &&
                   " Records Available"}
 
               </p>
@@ -1761,6 +1764,14 @@ function Dashboard() {
                 Billing
               </button>
 
+              <button
+                type="button"
+                onClick={() => setView("locationChanges")}
+                className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "locationChanges" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}
+              >
+                Location Changes
+              </button>
+
             </div>
 
           </div>
@@ -1783,6 +1794,8 @@ function Dashboard() {
                 : view ===
                   "parents"
                 ? "Parent Management"
+                : view === "locationChanges"
+                ? "Parent Location Requests"
                 : "Billing Settings"}
 
             </h3>
@@ -1831,6 +1844,8 @@ function Dashboard() {
               <BillingSettings />
 
             )}
+
+            {view === "locationChanges" && <LocationChangeRequests />}
 
           </div>
 
