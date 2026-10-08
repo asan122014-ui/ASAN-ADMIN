@@ -21,6 +21,7 @@ import LogsModal from "../components/LogsModal";
 import ParentTable from "../components/ParentTable";
 import PendingAlert from "../components/PendingAlert";
 import LocationChangeRequests from "../components/LocationChangeRequests";
+import DriverPayouts from "../components/DriverPayouts";
 
 import BillingSettings from "./BillingSettings";
 
@@ -1656,6 +1657,8 @@ function Dashboard() {
                   ? "Registered Parents"
                   : view === "locationChanges"
                   ? "Location Change Requests"
+                  : view === "driverPayouts"
+                  ? "Driver Payments"
                   : "Billing Settings"}
 
               </h2>
@@ -1671,7 +1674,7 @@ function Dashboard() {
                   : ""}
 
                 {view !==
-                  "billing" && view !== "locationChanges" &&
+                  "billing" && view !== "locationChanges" && view !== "driverPayouts" &&
                   " Records Available"}
 
               </p>
@@ -1763,6 +1766,8 @@ function Dashboard() {
                 Location Changes
               </button>
 
+              <button type="button" onClick={() => setView("driverPayouts")} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "driverPayouts" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}>Driver Payments</button>
+
             </div>
 
           </div>
@@ -1787,6 +1792,8 @@ function Dashboard() {
                 ? "Parent Management"
                 : view === "locationChanges"
                 ? "Parent Location Requests"
+                : view === "driverPayouts"
+                ? "Manual Driver Payouts"
                 : "Billing Settings"}
 
             </h3>
@@ -1837,6 +1844,8 @@ function Dashboard() {
             )}
 
             {view === "locationChanges" && <LocationChangeRequests />}
+
+            {view === "driverPayouts" && <DriverPayouts />}
 
           </div>
 
