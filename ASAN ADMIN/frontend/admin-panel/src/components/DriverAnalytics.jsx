@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
   Chart as ChartJS,
@@ -64,29 +64,32 @@ function DriverAnalytics({ stats = {} }) {
      DATE FILTER
   ========================================================= */
 
-  const filterData = (data) => {
-    if (!selectedDate) {
-      return data;
-    }
+  const filterData = useCallback(
+    (data) => {
+      if (!selectedDate) {
+        return data;
+      }
 
-    return data.filter(
-      (item) => String(item?._id || "") === selectedDate
-    );
-  };
+      return data.filter(
+        (item) => String(item?._id || "") === selectedDate
+      );
+    },
+    [selectedDate]
+  );
 
   const filteredRegistrations = useMemo(
     () => filterData(registrations),
-    [registrations, selectedDate]
+    [filterData, registrations]
   );
 
   const filteredApprovals = useMemo(
     () => filterData(approvals),
-    [approvals, selectedDate]
+    [filterData, approvals]
   );
 
   const filteredRejections = useMemo(
     () => filterData(rejections),
-    [rejections, selectedDate]
+    [filterData, rejections]
   );
 
   /* =========================================================

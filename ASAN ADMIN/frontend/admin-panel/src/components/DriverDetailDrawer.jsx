@@ -1680,6 +1680,7 @@ function DriverDetailDrawer({
 
       {previewImage && (
         <DocumentModal
+          key={previewImage}
           image={
             previewImage
           }

@@ -236,17 +236,8 @@ function Dashboard() {
   ] =
     useState("");
 
-  const [
-    filter,
-    setFilter,
-  ] =
-    useState("all");
-
-  const [
-    dateFilter,
-    setDateFilter,
-  ] =
-    useState("");
+  const filter = "all";
+  const dateFilter = "";
 
   /* =========================================================
      LOGS
