@@ -23,7 +23,6 @@ import PendingAlert from "../components/PendingAlert";
 import LocationChangeRequests from "../components/LocationChangeRequests";
 import DriverPayouts from "../components/DriverPayouts";
 
-import BillingSettings from "./BillingSettings";
 
 import {
   getDashboardStats,
@@ -1659,7 +1658,7 @@ function Dashboard() {
                   ? "Location Change Requests"
                   : view === "driverPayouts"
                   ? "Driver Payments"
-                  : "Billing Settings"}
+                  : "Registered Drivers"}
 
               </h2>
 
@@ -1673,8 +1672,7 @@ function Dashboard() {
                   ? parents.length
                   : ""}
 
-                {view !==
-                  "billing" && view !== "locationChanges" && view !== "driverPayouts" &&
+                {view !== "locationChanges" && view !== "driverPayouts" &&
                   " Records Available"}
 
               </p>
@@ -1735,31 +1733,6 @@ function Dashboard() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setView(
-                    "billing"
-                  )
-                }
-                className={`
-                  px-5
-                  py-2.5
-                  rounded-xl
-                  font-bold
-                  transition
-
-                  ${
-                    view ===
-                    "billing"
-                      ? "bg-[#FFB000] text-[#1C1917]"
-                      : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"
-                  }
-                `}
-              >
-                Billing
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setView("locationChanges")}
                 className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "locationChanges" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}
               >
@@ -1794,7 +1767,7 @@ function Dashboard() {
                 ? "Parent Location Requests"
                 : view === "driverPayouts"
                 ? "Manual Driver Payouts"
-                : "Billing Settings"}
+                : "Driver Management"}
 
             </h3>
 
@@ -1833,13 +1806,6 @@ function Dashboard() {
                   fetchParents
                 }
               />
-
-            )}
-
-            {view ===
-              "billing" && (
-
-              <BillingSettings />
 
             )}
 
