@@ -46,7 +46,7 @@ export default function LocationChangeRequests() {
         <article key={request._id} className="rounded-2xl border border-[#EEE4D5] bg-[#FFFCF6] p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#B77D00]">{request.locationType === "home" ? "Home pickup" : "School location"}</p>
+              <p className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#B77D00]">{request.locationType === "both" ? "Home and school locations" : request.locationType === "home" ? "Home pickup" : "School location"}</p>
               <h4 className="mt-1 text-lg font-extrabold text-[#1C1917]">{request.childName || "Child"}</h4>
               <p className="text-sm text-[#625B53]">Parent: {request.parentName || "—"}</p>
             </div>
