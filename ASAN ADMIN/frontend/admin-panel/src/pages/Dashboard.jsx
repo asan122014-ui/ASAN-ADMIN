@@ -2,6 +2,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 
 import { io } from "socket.io-client";
@@ -475,6 +476,7 @@ function Dashboard() {
         setDriverRequests(
           requests
         );
+        setSelectedRequest((current) => current ? requests.find((item) => item._id === current._id) || null : null);
       } catch (
         error
       ) {
@@ -676,6 +678,8 @@ function Dashboard() {
      ASSIGN DRIVER
   ========================================================= */
 
+  const assignmentInFlight = useRef(false);
+  const [assigningRequestId, setAssigningRequestId] = useState(null);
   const handleAssignDriver =
     async (
       request,
@@ -701,6 +705,9 @@ function Dashboard() {
         return;
       }
 
+      if (assignmentInFlight.current || request.matchingStatus === "Offered") return;
+      assignmentInFlight.current = true;
+      setAssigningRequestId(request._id);
       try {
         console.log(
           "Assigning driver:",
@@ -761,6 +768,9 @@ function Dashboard() {
             error?.message ||
             "Failed to assign driver."
         );
+      } finally {
+        assignmentInFlight.current = false;
+        setAssigningRequestId(null);
       }
     };
 
@@ -1003,6 +1013,11 @@ function Dashboard() {
      RECOMMENDED DRIVERS
   ========================================================= */
 
+  useEffect(() => {
+    const timer = setInterval(() => { if (!document.hidden) void loadRequests(); }, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
   const recommendedDrivers =
     useMemo(() => {
       if (
@@ -1024,7 +1039,8 @@ function Dashboard() {
         nearest.length >
         0
       ) {
-        return nearest;
+        const previousDrivers = [...(selectedRequest.rejectedDriverIds || []), ...(selectedRequest.delayedDriverIds || [])];
+        return [...nearest, ...approvedDrivers.filter((driver) => previousDrivers.includes(driver.driverId) && !nearest.some((item) => item.driverId === driver.driverId))];
       }
 
       return approvedDrivers;
@@ -1610,13 +1626,15 @@ function Dashboard() {
 
                               <button
                                 type="button"
+                                disabled={assigningRequestId === request._id}
                                 onClick={() =>
                                   setSelectedRequest(
                                     request
                                   )
                                 }
                                 className="
-                                  bg-[#FFB000]
+                                  disabled:opacity-50 disabled:cursor-not-allowed
+                                bg-[#FFB000]
                                   hover:bg-[#EFA500]
                                   text-[#1C1917]
                                   px-4
@@ -1626,7 +1644,7 @@ function Dashboard() {
                                   transition
                                 "
                               >
-                                Assign Driver
+                                {assigningRequestId === request._id ? "Sending request…" : "Assign Driver"}
                               </button>
 
                             )}
@@ -2023,6 +2041,7 @@ function Dashboard() {
 
                             <button
                               type="button"
+                              disabled={assigningRequestId === selectedRequest._id || selectedRequest.matchingStatus === "Offered" || (selectedRequest.rejectedDriverIds || []).includes(driver.driverId) || (selectedRequest.delayedDriverIds || []).includes(driver.driverId)}
                               onClick={() =>
                                 handleAssignDriver(
                                   selectedRequest,
@@ -2030,6 +2049,7 @@ function Dashboard() {
                                 )
                               }
                               className="
+                                disabled:opacity-50 disabled:cursor-not-allowed
                                 bg-[#FFB000]
                                 hover:bg-[#EFA500]
                                 text-[#1C1917]
@@ -2040,7 +2060,7 @@ function Dashboard() {
                                 transition
                               "
                             >
-                              Assign
+                              {(selectedRequest.rejectedDriverIds || []).includes(driver.driverId) ? "Declined" : (selectedRequest.delayedDriverIds || []).includes(driver.driverId) ? "Delayed" : assigningRequestId === selectedRequest._id ? "Sending…" : selectedRequest.matchingStatus === "Offered" ? "Waiting for response" : "Assign"}
                             </button>
 
                           </div>
