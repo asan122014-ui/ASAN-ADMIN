@@ -1235,6 +1235,9 @@ function Dashboard() {
       }
     );
 
+    const refreshBookingRequests = () => { void loadRequests(); };
+    ["booking_matching_offers_sent", "booking_matching_exhausted", "booking_driver_accepted", "booking_request_cancelled"].forEach((event) => socket.on(event, refreshBookingRequests));
+
     return () => {
       socket.off(
         "new_driver"
@@ -1520,6 +1523,9 @@ function Dashboard() {
                         status ===
                         "pending";
 
+                      const requestedThroughAsanId = request.requestType === "existing_driver" || request.booking?.driverChoice === "existing";
+                      const awaitingDriverResponse = isPending && request.matchingStatus === "Offered";
+
                       return (
                         <tr
                           key={
@@ -1594,7 +1600,13 @@ function Dashboard() {
 
                           <td>
 
-                            {isPending && (
+                            {requestedThroughAsanId && (
+                              <span className="font-semibold text-[#A97000]">Requested through ASAN ID{request.requestedDriverId ? ` - ${request.requestedDriverId}` : ""}</span>
+                            )}
+                            {!requestedThroughAsanId && awaitingDriverResponse && (
+                              <span className="font-semibold text-[#A97000]">Waiting for driver acceptance</span>
+                            )}
+                            {isPending && !requestedThroughAsanId && !awaitingDriverResponse && (
 
                               <button
                                 type="button"
