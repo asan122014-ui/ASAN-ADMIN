@@ -428,6 +428,7 @@ function Dashboard() {
      FETCH DRIVER REQUESTS
   ========================================================= */
 
+  const [requestsError, setRequestsError] = useState("");
   const loadRequests =
     async () => {
       try {
@@ -473,6 +474,7 @@ function Dashboard() {
           requests.length
         );
 
+        setRequestsError("");
         setDriverRequests(
           requests
         );
@@ -497,9 +499,7 @@ function Dashboard() {
             ?.data
         );
 
-        setDriverRequests(
-          []
-        );
+        setRequestsError("Unable to load driver requests. Please retry.");
       } finally {
         setLoadingRequests(
           false
@@ -1470,6 +1470,11 @@ function Dashboard() {
                 Loading requests...
               </div>
 
+            ) : requestsError ? (
+              <div role="alert" className="text-center py-10 text-red-700">
+                <p>{requestsError}</p>
+                <button type="button" onClick={() => void loadRequests()} className="mt-3 rounded-xl bg-[#FFB000] px-4 py-2 font-bold text-black">Retry</button>
+              </div>
             ) : driverRequests.length ===
               0 ? (
 
