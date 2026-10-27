@@ -23,6 +23,7 @@ import ParentTable from "../components/ParentTable";
 import PendingAlert from "../components/PendingAlert";
 import LocationChangeRequests from "../components/LocationChangeRequests";
 import DriverPayouts from "../components/DriverPayouts";
+import Announcements from '../components/Announcements';
 
 
 import {
@@ -1693,6 +1694,8 @@ function Dashboard() {
                   ? "Location Change Requests"
                   : view === "driverPayouts"
                   ? "Driver Payments"
+                  : view === "announcements"
+                  ? "Announcements"
                   : "Registered Drivers"}
 
               </h2>
@@ -1707,7 +1710,7 @@ function Dashboard() {
                   ? parents.length
                   : ""}
 
-                {view !== "locationChanges" && view !== "driverPayouts" &&
+                {view !== "locationChanges" && view !== "driverPayouts" && view !== "announcements" &&
                   " Records Available"}
 
               </p>
@@ -1776,6 +1779,7 @@ function Dashboard() {
 
               <button type="button" onClick={() => setView("driverPayouts")} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "driverPayouts" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}>Driver Payments</button>
 
+              {getStoredAdminRole() === 'superadmin' && <button type="button" onClick={() => setView('announcements')} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === 'announcements' ? 'bg-[#FFB000] text-[#1C1917]' : 'bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]'}`}>Announcements</button>}
             </div>
 
           </div>
@@ -1802,6 +1806,8 @@ function Dashboard() {
                 ? "Parent Location Requests"
                 : view === "driverPayouts"
                 ? "Manual Driver Payouts"
+                : view === "announcements"
+                ? "Announcements & Messages"
                 : "Driver Management"}
 
             </h3>
@@ -1847,6 +1853,7 @@ function Dashboard() {
             {view === "locationChanges" && <LocationChangeRequests />}
 
             {view === "driverPayouts" && <DriverPayouts />}
+            {view === "announcements" && getStoredAdminRole() === 'superadmin' && <Announcements />}
 
           </div>
 
