@@ -191,6 +191,7 @@ function DriverTable({
                 Contact
               </th>
 
+              <th className="px-6 py-4">Account / Institute</th>
               <th className="px-6 py-4">
                 Vehicle
               </th>
@@ -314,6 +315,8 @@ function DriverTable({
                       </div>
 
                     </td>
+
+                    <td className="px-6 py-5 text-sm">{driver.accountSource === "institute" ? driver.instituteName : "Individual"}</td>
 
                     {/* VEHICLE */}
 

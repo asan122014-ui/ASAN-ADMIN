@@ -351,6 +351,7 @@ function ParentTable({
                               "--"}
 
                           </span>
+                      <p className="mt-1 text-xs font-bold text-amber-800">{parent.accountSource === "institute" ? parent.instituteName : "Individual account"}</p>
 
                         </div>
 
