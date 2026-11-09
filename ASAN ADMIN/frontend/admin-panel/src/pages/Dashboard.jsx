@@ -1695,6 +1695,10 @@ function Dashboard() {
                   ? "Location Change Requests"
                   : view === "driverPayouts"
                   ? "Driver Payments"
+                  : view === "institutes"
+                  ? "Registered Schools"
+                  : view === "institutes"
+                  ? "Registered Schools"
                   : view === "announcements"
                   ? "Announcements"
                   : "Registered Drivers"}
@@ -1711,7 +1715,7 @@ function Dashboard() {
                   ? parents.length
                   : ""}
 
-                {view !== "locationChanges" && view !== "driverPayouts" && view !== "announcements" &&
+                {view !== "institutes" && view !== "institutes" && view !== "locationChanges" && view !== "driverPayouts" && view !== "announcements" &&
                   " Records Available"}
 
               </p>
@@ -1780,7 +1784,7 @@ function Dashboard() {
 
               <button type="button" onClick={() => setView("driverPayouts")} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "driverPayouts" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}>Driver Payments</button>
 
-              <button type="button" onClick={() => setView('institutes')} className="rounded-xl border px-5 py-2.5 font-bold">Institutes</button>
+              <button type="button" onClick={() => setView('institutes')} className={`rounded-xl px-5 py-2.5 font-bold ${view === "institutes" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53]"}`}>Registered Schools</button>
               {getStoredAdminRole() === 'superadmin' && <button type="button" onClick={() => setView('announcements')} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === 'announcements' ? 'bg-[#FFB000] text-[#1C1917]' : 'bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]'}`}>Announcements</button>}
             </div>
 
@@ -1808,7 +1812,11 @@ function Dashboard() {
                 ? "Parent Location Requests"
                 : view === "driverPayouts"
                 ? "Manual Driver Payouts"
-                : view === "announcements"
+                : view === "institutes"
+                  ? "Registered Schools"
+                  : view === "institutes"
+                  ? "Registered Schools"
+                  : view === "announcements"
                 ? "Announcements & Messages"
                 : "Driver Management"}
 
