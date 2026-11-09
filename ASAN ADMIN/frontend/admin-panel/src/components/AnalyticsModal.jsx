@@ -13,6 +13,7 @@ import {
 function AnalyticsModal({
   stats = {},
   onClose,
+  embedded = false,
 }) {
   /* =========================================================
      ESC CLOSE
@@ -43,6 +44,7 @@ function AnalyticsModal({
   ========================================================= */
 
   useEffect(() => {
+    if (embedded) return;
     const previousOverflow =
       document.body.style.overflow;
 
@@ -53,7 +55,7 @@ function AnalyticsModal({
       document.body.style.overflow =
         previousOverflow;
     };
-  }, []);
+  }, [embedded]);
 
   /* =========================================================
      SAFE DATA
@@ -162,7 +164,7 @@ function AnalyticsModal({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+      className={embedded ? "admin-report" : "fixed inset-0 z-[90] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"}
     >
       <div
         onClick={(event) =>

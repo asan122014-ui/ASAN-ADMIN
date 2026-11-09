@@ -26,6 +26,7 @@ import {
 function LogsModal({
   logs = [],
   onClose,
+  embedded = false,
 }) {
   const logList =
     Array.isArray(logs)
@@ -80,6 +81,7 @@ function LogsModal({
   ========================================================= */
 
   useEffect(() => {
+    if (embedded) return;
     const previousOverflow =
       document.body.style
         .overflow;
@@ -91,7 +93,7 @@ function LogsModal({
       document.body.style.overflow =
         previousOverflow;
     };
-  }, []);
+  }, [embedded]);
 
   /* =========================================================
      DATE FORMAT
@@ -480,7 +482,7 @@ function LogsModal({
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-6"
+      className={embedded ? "admin-report" : "fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-6"}
       onClick={() =>
         onClose?.()
       }

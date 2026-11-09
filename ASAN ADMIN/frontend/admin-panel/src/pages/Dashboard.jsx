@@ -14,7 +14,9 @@ import {
 
 import axios from "axios";
 
-import Topbar from "../components/Topbar";
+import AdminNavigation, { adminSections } from "../components/AdminNavigation";
+import { useSearchParams } from "react-router-dom";
+import "../admin-shell.css";
 import StatsPanel from "../components/StatsPanel";
 import DriverTable from "../components/DriverTable";
 import DriverDetailDrawer from "../components/DriverDetailDrawer";
@@ -117,13 +119,12 @@ function Dashboard() {
      VIEW
   ========================================================= */
 
-  const [
-    view,
-    setView,
-  ] =
-    useState(
-      "drivers"
-    );
+  const [sectionParams, setSectionParams] = useSearchParams();
+  const requestedSection = sectionParams.get('section') || 'overview';
+  const role = getStoredAdminRole();
+  const view = adminSections.some(item => item.id === requestedSection && (!item.superadmin || role === 'superadmin')) ? requestedSection : 'overview';
+  const setView = next => { setSectionParams({ section: next }); setSearch(''); };
+  const currentSection = adminSections.find(item => item.id === view);
 
   /* =========================================================
      DRIVER DATA
@@ -221,17 +222,9 @@ function Dashboard() {
   ] =
     useState(false);
 
-  const [
-    showAnalytics,
-    setShowAnalytics,
-  ] =
-    useState(false);
 
-  const [
-    showLogs,
-    setShowLogs,
-  ] =
-    useState(false);
+
+
 
   const [
     search,
@@ -1290,127 +1283,14 @@ function Dashboard() {
   ========================================================= */
 
   return (
-    <div className="min-h-screen bg-[#FFF9EE]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {/* ===================================================
-            HEADER
-        =================================================== */}
-
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-8">
-
-          <div>
-            <p className="text-xs font-bold tracking-[0.2em] text-[#B87700] mb-2">
-              ASAN INSTITUTE · OVERVIEW
-            </p>
-
-            <h1 className="text-3xl sm:text-4xl font-black text-[#1C1917]">
-              Institute Overview
-            </h1>
-
-            <p className="text-[#8C8276] mt-2">
-              A clear view of your school transport operations, people and daily activity.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-
-            <div className="bg-[#FFFDF8] border border-[#EED69B] rounded-2xl px-6 py-4 shadow-sm min-w-[150px]">
-              <p className="text-xs font-semibold text-[#8C8276]">
-                Active Drivers
-              </p>
-
-              <h2 className="text-3xl font-black text-[#1C1917] mt-1">
-                {stats.totalDrivers}
-              </h2>
-            </div>
-
-            <button
-              type="button"
-              onClick={
-                refreshDashboard
-              }
-              disabled={
-                refreshing
-              }
-              className="
-                flex
-                items-center
-                gap-2
-                rounded-2xl
-                bg-[#FFB000]
-                px-5
-                py-4
-                font-bold
-                text-[#1C1917]
-                shadow-sm
-                transition
-                hover:bg-[#EFA500]
-                disabled:opacity-60
-              "
-            >
-              <RefreshCw
-                size={18}
-                className={
-                  refreshing
-                    ? "animate-spin"
-                    : ""
-                }
-              />
-
-              {refreshing
-                ? "Refreshing..."
-                : "Refresh"}
-            </button>
-
-          </div>
-        </div>
-
-        {/* ===================================================
-            SEARCH / ACTION BAR
-        =================================================== */}
-
-        <div className="bg-[#FFFDF8] rounded-2xl border border-[#EEE4D5] p-5 mb-8 shadow-sm">
-
-          <Topbar
-            search={
-              search
-            }
-            setSearch={
-              setSearch
-            }
-            openAnalytics={() =>
-              setShowAnalytics(
-                true
-              )
-            }
-            openLogs={
-              async () => {
-                const role =
-                  getStoredAdminRole();
-
-                if (
-                  role !==
-                  "superadmin"
-                ) {
-                  alert(
-                    "Admin logs are available only to Super Admin."
-                  );
-
-                  return;
-                }
-
-                await fetchLogs();
-
-                setShowLogs(
-                  true
-                );
-              }
-            }
-          />
-
-        </div>
-
+    <div className="admin-shell">
+      <AdminNavigation view={view} onNavigate={setView} pending={pendingRequestCount} />
+      <main className="admin-main" id="admin-main">
+        <header className="admin-page-header">
+          <div><p className="admin-eyebrow">ASAN CONTROL CENTRE</p><h1>{currentSection.label}</h1><p>{currentSection.description}</p></div>
+          <button type="button" className="admin-refresh" onClick={refreshDashboard} disabled={refreshing}><RefreshCw size={17} className={refreshing ? 'animate-spin' : ''}/>{refreshing ? 'Refreshing...' : 'Refresh'}</button>
+        </header>
+        {view === 'overview' && <>
         {/* ===================================================
             STATS
         =================================================== */}
@@ -1435,6 +1315,9 @@ function Dashboard() {
           }
         />
 
+        <div className="admin-overview-actions"><button onClick={() => setView('requests')}>Review driver requests <span>{pendingRequestCount} pending</span></button><button onClick={() => setView('drivers')}>Manage drivers <span>Registrations & approvals</span></button><button onClick={() => setView('institutes')}>Registered schools <span>School accounts & enrollment</span></button></div>
+        </>}
+        {view === 'requests' && <>
         {/* ===================================================
             DRIVER REQUESTS
         =================================================== */}
@@ -1673,156 +1556,14 @@ function Dashboard() {
 
         </div>
 
-        {/* ===================================================
-            VIEW SELECTOR
-        =================================================== */}
-
-        <div className="bg-[#FFFDF8] rounded-2xl border border-[#EEE4D5] p-5 mb-8 shadow-sm">
-
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-
-            <div>
-
-              <h2 className="text-2xl font-black text-[#1C1917]">
-
-                {view ===
-                "drivers"
-                  ? "Registered Drivers"
-                  : view ===
-                    "parents"
-                  ? "Registered Parents"
-                  : view === "locationChanges"
-                  ? "Location Change Requests"
-                  : view === "driverPayouts"
-                  ? "Driver Payments"
-                  : view === "institutes"
-                  ? "Registered Schools"
-                  : view === "institutes"
-                  ? "Registered Schools"
-                  : view === "announcements"
-                  ? "Announcements"
-                  : "Registered Drivers"}
-
-              </h2>
-
-              <p className="text-sm text-[#8C8276] mt-1">
-
-                {view ===
-                "drivers"
-                  ? filteredDrivers.length
-                  : view ===
-                    "parents"
-                  ? parents.length
-                  : ""}
-
-                {view !== "institutes" && view !== "institutes" && view !== "locationChanges" && view !== "driverPayouts" && view !== "announcements" &&
-                  " Records Available"}
-
-              </p>
-
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-
-              <button
-                type="button"
-                onClick={() =>
-                  setView(
-                    "drivers"
-                  )
-                }
-                className={`
-                  px-5
-                  py-2.5
-                  rounded-xl
-                  font-bold
-                  transition
-
-                  ${
-                    view ===
-                    "drivers"
-                      ? "bg-[#FFB000] text-[#1C1917]"
-                      : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"
-                  }
-                `}
-              >
-                Drivers
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setView(
-                    "parents"
-                  )
-                }
-                className={`
-                  px-5
-                  py-2.5
-                  rounded-xl
-                  font-bold
-                  transition
-
-                  ${
-                    view ===
-                    "parents"
-                      ? "bg-[#FFB000] text-[#1C1917]"
-                      : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"
-                  }
-                `}
-              >
-                Parents
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setView("locationChanges")}
-                className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "locationChanges" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}
-              >
-                Location Changes
-              </button>
-
-              <button type="button" onClick={() => setView("driverPayouts")} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === "driverPayouts" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]"}`}>Driver Payments</button>
-
-              <button type="button" onClick={() => setView('institutes')} className={`rounded-xl px-5 py-2.5 font-bold ${view === "institutes" ? "bg-[#FFB000] text-[#1C1917]" : "bg-[#F6F0E7] text-[#625B53]"}`}>Registered Schools</button>
-              {getStoredAdminRole() === 'superadmin' && <button type="button" onClick={() => setView('announcements')} className={`px-5 py-2.5 rounded-xl font-bold transition ${view === 'announcements' ? 'bg-[#FFB000] text-[#1C1917]' : 'bg-[#F6F0E7] text-[#625B53] hover:bg-[#EFE5D6]'}`}>Announcements</button>}
-            </div>
-
-          </div>
-
-        </div>
-
+        </>}
+        {['drivers', 'parents', 'locationChanges', 'driverPayouts', 'institutes', 'announcements'].includes(view) && <>
+        {view === 'drivers' && <label className="admin-search-label">Search drivers<input type="search" placeholder="Name, email, phone, ASAN ID or vehicle" value={search} onChange={event => setSearch(event.target.value)} /></label>}
         {/* ===================================================
             MAIN CONTENT
         =================================================== */}
 
         <div className="bg-[#FFFDF8] rounded-2xl border border-[#EEE4D5] overflow-hidden shadow-sm">
-
-          <div className="px-6 py-4 border-b border-[#EEE4D5]">
-
-            <h3 className="text-lg font-bold text-[#4A433B]">
-
-              {view ===
-              "drivers"
-                ? "Driver Management"
-                : view ===
-                  "parents"
-                ? "Parent Management"
-                : view === "locationChanges"
-                ? "Parent Location Requests"
-                : view === "driverPayouts"
-                ? "Manual Driver Payouts"
-                : view === "institutes"
-                  ? "Registered Schools"
-                  : view === "institutes"
-                  ? "Registered Schools"
-                  : view === "announcements"
-                ? "Announcements & Messages"
-                : "Driver Management"}
-
-            </h3>
-
-          </div>
 
           <div className="p-6">
 
@@ -1870,6 +1611,9 @@ function Dashboard() {
 
         </div>
 
+        </>}
+        {view === 'analytics' && <AnalyticsModal embedded stats={analyticsData} onClose={() => setView('overview')} />}
+        {view === 'logs' && role === 'superadmin' && <LogsSection fetchLogs={fetchLogs} logs={filteredLogs} onClose={() => setView('overview')} />}
         {/* ===================================================
             ASSIGN DRIVER MODAL
         =================================================== */}
@@ -2134,47 +1878,14 @@ function Dashboard() {
 
         )}
 
-        {/* ===================================================
-            ANALYTICS MODAL
-        =================================================== */}
 
-        {showAnalytics && (
-
-          <AnalyticsModal
-            stats={
-              analyticsData
-            }
-            onClose={() =>
-              setShowAnalytics(
-                false
-              )
-            }
-          />
-
-        )}
-
-        {/* ===================================================
-            LOGS MODAL
-        =================================================== */}
-
-        {showLogs && (
-
-          <LogsModal
-            logs={
-              filteredLogs
-            }
-            onClose={() =>
-              setShowLogs(
-                false
-              )
-            }
-          />
-
-        )}
-
-      </div>
+      </main>
     </div>
   );
 }
 
+function LogsSection({ fetchLogs, logs, onClose }) {
+  useEffect(() => { fetchLogs(); }, []);
+  return <LogsModal embedded logs={logs} onClose={onClose} />;
+}
 export default Dashboard;
