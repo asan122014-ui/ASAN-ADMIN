@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import adminApi from '../services/adminApi';
 
-import { getStoredAdminRole } from '../services/adminAuthService';
+
 
 function DriverDocuments({ instituteId, driverId }) {
 
@@ -18,7 +18,7 @@ function DriverDocuments({ instituteId, driverId }) {
 
 export default function Institutes() {
 
-  const [institutes, setInstitutes] = useState([]), [open, setOpen] = useState(''), [kind, setKind] = useState('drivers'), [members, setMembers] = useState({ data: [] }), [page, setPage] = useState(1), [error, setError] = useState(''), [busy, setBusy] = useState(false), [prefix, setPrefix] = useState('');
+  const [institutes, setInstitutes] = useState([]), [open, setOpen] = useState(''), [kind, setKind] = useState('drivers'), [members, setMembers] = useState({ data: [] }), [page, setPage] = useState(1), [error, setError] = useState(''), [busy, setBusy] = useState(false);
 
   const load = async () => { try { setInstitutes((await adminApi.get('/institute-admin')).data.data); } catch (error) { setError(error.response?.data?.message || 'Unable to load Institutes.'); } };
 
@@ -36,25 +36,13 @@ export default function Institutes() {
 
   }, [open, kind, page]);
 
-  const save = async (institute, enabled) => {
-
-    setBusy(true); setError('');
-
-    try { await adminApi.patch(`/institute-admin/${institute._id}/enrollment`, { enabled, driverPrefix: prefix }); await load(); }
-
-    catch (error) { setError(error.response?.data?.message || 'Unable to update Institute.'); }
-
-    finally { setBusy(false); }
-
-  };
-
-  return <div className="space-y-5"><h2 className="text-2xl font-bold">Registered Schools</h2><p>Select a school to view its drivers, parents and students. School accounts are managed separately from regular accounts.</p>{error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">{error}</p>}
+  return <div className="space-y-5"><h2 className="text-2xl font-bold">Registered Schools</h2><p>Select a school to view its drivers, parents and students. Schools appear automatically after registration. Their accounts are kept separate from regular accounts.</p>{error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">{error}</p>}
 
     {!institutes.length && <p>No Institutes available.</p>}
 
-    {institutes.map(institute => <section key={institute._id} className="overflow-hidden rounded-2xl border border-[#E7D9C2] bg-white"><button className="flex w-full flex-wrap items-center justify-between gap-4 p-5 text-left" aria-expanded={open === institute._id} onClick={() => { setOpen(open === institute._id ? '' : institute._id); setPrefix(institute.driverPrefix || ''); setPage(1); }}><span className="font-bold">{institute.name}<span className="mt-1 block text-sm font-normal">{institute.managedEnrollmentEnabled ? `Enrollment enabled  /  ${institute.driverPrefix}` : 'Enrollment awaiting activation'}</span></span><span>{institute.drivers} drivers  /  {institute.parents} parents  /  {institute.children} students  +</span></button>
+    {institutes.map(institute => <section key={institute._id} className="overflow-hidden rounded-2xl border border-[#E7D9C2] bg-white"><button className="flex w-full flex-wrap items-center justify-between gap-4 p-5 text-left" aria-expanded={open === institute._id} onClick={() => { setOpen(open === institute._id ? '' : institute._id); setPage(1); }}><span className="font-bold">{institute.name}<span className="mt-1 block text-sm font-normal">{institute.managedEnrollmentEnabled ? `Automatic enrollment / ${institute.driverPrefix}` : 'Automatic setup'}</span></span><span>{institute.drivers} drivers  /  {institute.parents} parents  /  {institute.children} students  +</span></button>
 
-      {open === institute._id && <div className="border-t p-5">{getStoredAdminRole() === 'superadmin' && <div className="mb-5 flex flex-wrap items-end gap-3"><label>Unique Institute prefix<input className="mt-1 block rounded-lg border p-3" value={prefix} maxLength={12} onChange={event => setPrefix(event.target.value.toUpperCase())} placeholder="KGR" /></label><button disabled={busy} className="rounded-lg bg-amber-400 p-3 font-bold disabled:opacity-50" onClick={() => save(institute, !institute.managedEnrollmentEnabled)}>{institute.managedEnrollmentEnabled ? 'Pause enrollment' : 'Enable enrollment'}</button></div>}
+      {open === institute._id && <div className="border-t p-5">
 
       <div className="mb-4 flex flex-wrap gap-2">{['drivers', 'parents', 'children'].map(tab => <button key={tab} onClick={() => { setKind(tab); setPage(1); }} className={`rounded-lg border px-4 py-2 capitalize ${kind === tab ? 'bg-amber-100 font-bold' : ''}`}>{tab === "children" ? "Students" : tab}</button>)}</div>{busy && <p role="status">Loading...</p>}
 
