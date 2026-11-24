@@ -6,13 +6,15 @@ import adminApi from "./adminApi";
 
 export const loginAdmin = async (
   email,
-  password
+  password,
+  verification = {}
 ) => {
   const response = await adminApi.post(
     "/admin-auth/login",
     {
       email,
       password,
+      ...verification,
     }
   );
 

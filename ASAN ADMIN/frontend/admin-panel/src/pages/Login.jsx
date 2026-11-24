@@ -14,6 +14,8 @@ import {
 } from "../services/adminAuthService";
 
 function Login() {
+  const [challengeId,setChallengeId]=useState("");
+  const [otp,setOtp]=useState("");
   const [email, setEmail] =
     useState("");
 
@@ -107,7 +109,8 @@ function Login() {
         const response =
           await loginAdmin(
             normalizedEmail,
-            password
+            password,
+            {challengeId:challengeId || undefined,otp}
           );
 
         /* =====================================================
@@ -122,6 +125,8 @@ function Login() {
               "Login failed"
           );
         }
+
+        if(response.mfaRequired){setChallengeId(response.challengeId);setOtp("");return;}
 
         const token =
           response.token;
@@ -415,6 +420,7 @@ function Login() {
                 LOGIN BUTTON
             =============================================== */}
 
+            {challengeId && <div className="mb-4"><label htmlFor="admin-otp" className="block mb-2 font-semibold">Verification code from your admin email</label><input id="admin-otp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,""))} className="w-full h-14 rounded-xl border border-[#EEE4D5] px-4"/><button type="button" onClick={()=>{setChallengeId("");setOtp("");}} className="mt-2 text-sm underline">Request another code</button></div>}
             <button
               type="button"
               disabled={
@@ -427,7 +433,7 @@ function Login() {
             >
               {loading
                 ? "Signing in..."
-                : "Sign in to Admin"}
+                : challengeId ? "Verify and sign in" : "Sign in to Admin"}
             </button>
 
           </div>
